@@ -7,7 +7,7 @@ attributes:
 components:
 - name: tilt-container
   container:
-    image: quay.io/mloriedo/universal-developer-image:tilt
+    image: quay.io/devspaces/udi-rhel8@sha256:356f69810dacf3c7f7f0c24c06fc4030c5abc60698985f98155d38d1c6163de5
     env:
       - name: QUARKUS_HTTP_HOST
         value: 0.0.0.0
