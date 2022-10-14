@@ -13,10 +13,10 @@ components:
         value: 0.0.0.0
       - name: MAVEN_OPTS
         value: "-Dmaven.repo.local=/home/user/.m2/repository"
-    memoryLimit: 4G
+    memoryLimit: 3G
     memoryRequest: 1G
-    cpuLimit: 800m
-    cpuRequest: 500m
+    cpuLimit: 500m
+    cpuRequest: 300m
     endpoints:
       - name: quarkus-development-server
         targetPort: 8080
