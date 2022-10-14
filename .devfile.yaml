@@ -42,33 +42,46 @@ components:
           urlRewriteSupported: false
 
 commands:
-  - id: 0-patchdw
-    exec:
-      commandLine: 'kubectl patch dw tilt-n-quarkus --type=merge -p ''{"spec": {"template": {"attributes": {"controller.devfile.io/scc": "container-build"}}}}'''
-      workingDir: ${PROJECT_SOURCE}/201-quarkus-live-update
-      component: tilt-container
   - id: 0-podmanlogin
     exec:
       commandLine: 'podman login quay.io'
       workingDir: ${PROJECT_SOURCE}/201-quarkus-live-update
       component: tilt-container
-  - id: 0-buildah-bud
+      label: 'STEP 0: podman login quay.io (prep)'
+  - id: 1-mvn-build
     exec:
-      commandLine: 'buildah bud -t quarkus-sync-image -f src/main/docker/Dockerfile.jvm .'
+      commandLine: 'mvn clean package'
       workingDir: ${PROJECT_SOURCE}/201-quarkus-live-update
       component: tilt-container
-  - id: 1-tilt-up
+      label: 'STEP 1: maven build'
+  - id: 2-mvn-compile-quarkus-dev
+    exec:
+      commandLine: 'mvn compile quarkus:dev'
+      workingDir: ${PROJECT_SOURCE}/201-quarkus-live-update
+      component: tilt-container
+      label: 'STEP 2: maven run'
+  - id: 3-podman-build
+    exec:
+      commandLine: 'podman build -t quarkus-sync-image -f src/main/docker/Dockerfile.jvm .'
+      workingDir: ${PROJECT_SOURCE}/201-quarkus-live-update
+      component: tilt-container
+      label: 'STEP 3: podman build'
+  - id: 4-tilt-up
     exec:
       commandLine: 'tilt up -f Tiltfile.buildah --host 0.0.0.0 --namespace ${DEVWORKSPACE_NAMESPACE}'
       workingDir: ${PROJECT_SOURCE}/201-quarkus-live-update
       component: tilt-container
-  - id: 2-poll
+      label: 'STEP 4: Tilt up'
+  - id: 5-poll
     exec:
       commandLine: './poll.sh'
       workingDir: ${PROJECT_SOURCE}/201-quarkus-live-update
       component: tilt-container
-  - id: 3-tilt-down
+      label: 'STEP 5: Test the REST API every 5 seconds'
+  - id: 6-tilt-down
     exec:
       commandLine: 'tilt down -f Tiltfile.buildah'
       workingDir: ${PROJECT_SOURCE}/201-quarkus-live-update
       component: tilt-container
+      label: 'STEP 6: Tilt down'
+ 
